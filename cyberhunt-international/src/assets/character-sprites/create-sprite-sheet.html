@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Sprite Sheet - CyberHunt Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #4f46e5;
+        }
+        .sprite-preview {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+        .frame {
+            min-width: 64px;
+            height: 64px;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            border: 3px solid #1e40af;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .frame:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .animated-demo {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 15px;
+        }
+        .walking-animation {
+            display: inline-block;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            border: 3px solid #1e40af;
+            border-radius: 8px;
+            animation: walk 1.2s infinite steps(6);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        @keyframes walk {
+            0% { background-position: 0 0; }
+            100% { background-position: -384px 0; }
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .highlight {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .steps {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .steps h3 {
+            color: #166534;
+            margin-top: 0;
+        }
+        .steps ol {
+            color: #166534;
+            line-height: 1.8;
+        }
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #991b1b;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #166534;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Crear Sprite Sheet para CyberHunt</h1>
+            <p>Guía completa para crear animaciones de personaje</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>🖼️ ¿Qué es un Sprite Sheet?</h2>
+                <p>Un sprite sheet es una imagen que contiene múltiples frames de animación en una sola imagen. Esto permite que el juego muestre animaciones fluidas sin cargar múltiples archivos.</p>
+                
+                <div class="sprite-preview">
+                    <div class="frame">Frame 1</div>
+                    <div class="frame">Frame 2</div>
+                    <div class="frame">Frame 3</div>
+                    <div class="frame">Frame 4</div>
+                    <div class="frame">Frame 5</div>
+                    <div class="frame">Frame 6</div>
+                </div>
+            </div>
+
+            <div class="animated-demo">
+                <h3>🎬 Animación de Ejemplo:</h3>
+                <div class="walking-animation"></div>
+                <p><em>Esta es la animación que verás en el juego</em></p>
+            </div>
+
+            <div class="section">
+                <h2>📋 Especificaciones Técnicas</h2>
+                <div class="code-block">
+// Configuración recomendada para CyberHunt
+{
+  frameWidth: 64,        // Ancho de cada frame
+  frameHeight: 64,       // Alto de cada frame
+  totalFrames: 6,        // Número total de frames
+  animationSpeed: 12,    // FPS de la animación
+  format: "PNG",         // Formato recomendado
+  transparency: true      // Con transparencia
+}
+                </div>
+            </div>
+
+            <div class="steps">
+                <h3>🚀 Pasos para Crear tu Sprite Sheet:</h3>
+                <ol>
+                    <li><strong>Diseña tu personaje:</strong> Crea 6-8 frames de caminar</li>
+                    <li><strong>Mantén consistencia:</strong> Mismo tamaño y estilo en todos los frames</li>
+                    <li><strong>Organiza horizontalmente:</strong> Frames de izquierda a derecha</li>
+                    <li><strong>Exporta como PNG:</strong> Con transparencia si es posible</li>
+                    <li><strong>Guarda en la carpeta:</strong> <span class="highlight">assets/character-sprites/</span></li>
+                    <li><strong>Nombra el archivo:</strong> <span class="highlight">walking-sprite-sheet.png</span></li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>🎨 Herramientas Recomendadas</h2>
+                <ul>
+                    <li><strong>Gratuitas:</strong> GIMP, Piskel, Aseprite (versión gratuita)</li>
+                    <li><strong>Profesionales:</strong> Adobe Photoshop, Aseprite (completo)</li>
+                    <li><strong>Online:</strong> Piskel.app, Pixilart.com</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                <h3>⚠️ Importante:</h3>
+                <ul>
+                    <li>Todos los frames deben tener exactamente el mismo tamaño</li>
+                    <li>La imagen debe ser horizontal (no vertical)</li>
+                    <li>Usa PNG para mantener la transparencia</li>
+                    <li>El nombre del archivo debe ser exactamente: <span class="highlight">walking-sprite-sheet.png</span></li>
+                </ul>
+            </div>
+
+            <div class="success">
+                <h3>✅ Una vez Completado:</h3>
+                <p>El juego automáticamente detectará tu sprite sheet y:</p>
+                <ul>
+                    <li>Mostrará la animación de caminar cuando te muevas</li>
+                    <li>Cambiará la dirección del personaje según el movimiento</li>
+                    <li>Mantendrá la animación fluida a 12 FPS</li>
+                    <li>Se adaptará al tamaño configurado (64x64 píxeles)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>🔧 Personalización Avanzada</h2>
+                <p>Puedes modificar la configuración en <span class="highlight">src/config/spriteConfig.ts</span>:</p>
+                <div class="code-block">
+// Cambiar velocidad de animación
+animationSpeed: 18,  // Más rápido
+
+// Cambiar número de frames
+totalFrames: 8,      // Más frames
+
+// Cambiar tamaño
+frameWidth: 32,      // Más pequeño
+frameHeight: 32
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎯 Próximos Pasos</h2>
+                <ol>
+                    <li>Crea tu sprite sheet siguiendo esta guía</li>
+                    <li>Guárdalo en la carpeta correcta</li>
+                    <li>Reinicia el juego</li>
+                    <li>¡Disfruta de tu personaje animado!</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

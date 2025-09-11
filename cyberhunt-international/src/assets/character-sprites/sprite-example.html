@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprite Sheet Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sprite-example {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+        .frame {
+            width: 64px;
+            height: 64px;
+            background: #4a90e2;
+            border: 2px solid #357abd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .frame:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s;
+        }
+        .animation-demo {
+            margin: 20px 0;
+            padding: 20px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .animated-sprite {
+            display: inline-block;
+            width: 64px;
+            height: 64px;
+            background: #4a90e2;
+            border: 2px solid #357abd;
+            border-radius: 8px;
+            animation: walk 1s infinite steps(6);
+        }
+        @keyframes walk {
+            0% { background-position: 0 0; }
+            100% { background-position: -384px 0; }
+        }
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .code-example {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Ejemplo de Sprite Sheet para el Personaje</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instrucciones:</h3>
+            <p>Este es un ejemplo visual de cómo deberían organizarse las imágenes para la animación del personaje.</p>
+        </div>
+
+        <h2>🖼️ Sprite Sheet Horizontal (Recomendado)</h2>
+        <p>Una sola imagen con todos los frames de caminar:</p>
+        
+        <div class="sprite-example">
+            <div class="frame">Frame 1</div>
+            <div class="frame">Frame 2</div>
+            <div class="frame">Frame 3</div>
+            <div class="frame">Frame 4</div>
+            <div class="frame">Frame 5</div>
+            <div class="frame">Frame 6</div>
+        </div>
+
+        <div class="animation-demo">
+            <h3>🎬 Animación de Ejemplo:</h3>
+            <div class="animated-sprite"></div>
+            <p><em>Hover sobre los frames para ver el efecto</em></p>
+        </div>
+
+        <h2>📁 Imágenes Individuales</h2>
+        <p>Alternativa: cada frame como archivo separado:</p>
+        
+        <div class="sprite-example">
+            <div class="frame">walking-1.png</div>
+            <div class="frame">walking-2.png</div>
+            <div class="frame">walking-3.png</div>
+            <div class="frame">walking-4.png</div>
+            <div class="frame">walking-5.png</div>
+            <div class="frame">walking-6.png</div>
+        </div>
+
+        <div class="instructions">
+            <h3>⚙️ Configuración Técnica:</h3>
+            <ul>
+                <li><strong>Tamaño de frame:</strong> 64x64 píxeles (recomendado)</li>
+                <li><strong>Número de frames:</strong> 6-8 para animación suave</li>
+                <li><strong>Formato:</strong> PNG con transparencia</li>
+                <li><strong>FPS:</strong> 12-24 frames por segundo</li>
+            </ul>
+        </div>
+
+        <div class="code-example">
+// El juego automáticamente detectará y usará tus sprites
+// Solo coloca las imágenes en la carpeta character-sprites/
+// y el sistema de animación se encargará del resto
+        </div>
+
+        <h2>🎯 Próximos Pasos:</h2>
+        <ol>
+            <li>Coloca tus imágenes del personaje en la carpeta <code>character-sprites/</code></li>
+            <li>El juego detectará automáticamente las imágenes</li>
+            <li>La animación se activará cuando el personaje se mueva</li>
+            <li>El personaje cambiará de dirección según el movimiento</li>
+        </ol>
+    </div>
+</body>
+</html>
