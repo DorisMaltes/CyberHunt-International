@@ -20,7 +20,7 @@ export default function LogInPage(){
     const navigate = useNavigate();
 
     const { mutate, isLoading, isError, error } = useLogin((uid) => {
-    navigate("/home");
+    navigate("/game");
     });
 
     const handleLogin = () => {
