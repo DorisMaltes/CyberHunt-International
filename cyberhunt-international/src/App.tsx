@@ -4,6 +4,7 @@ import LogInPageAndRegisterPage from './pages/LogInPageAndRegisterPage'
 import TopDownWorld from './pages/WorldMap'
 import HomePage from './pages/HomePage'
 import LeaderboardPage from './pages/LeaderboardPage'
+import QuizPage from './pages/QuizPage'
 
 
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/quiz" element={<QuizPage />} />
         </Routes>
       </BrowserRouter>
     )

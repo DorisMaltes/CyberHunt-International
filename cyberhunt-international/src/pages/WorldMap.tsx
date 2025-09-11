@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Top‑down 2D world that uses YOUR OWN MAP IMAGE as the world.
@@ -20,14 +21,16 @@ type Rect = { x: number; y: number; w: number; h: number };
 const MAP_URL = "./mapa.png";
 const MAP_SIZE: Vec2 = { x: 3000, y: 2000 }; // pixel dimensions of your image
 
-// Optional: simple rectangular colliders (world coordinates)
-const BLOCKS: Rect[] = [
-  // Example obstacles:
-  //example of rectangles
-  { x: 1200, y: 700, w: 180, h: 120 },
-  { x: 1600, y: 1100, w: 260, h: 160 },
-  { x: 1000, y: 1000, w: 200, h: 200 },
+// Booth obstacles that act as quiz stations
+const BOOTHS: (Rect & { id: string; name: string })[] = [
+  { x: 1200, y: 700, w: 180, h: 120, id: "booth1", name: "Security Booth" },
+  { x: 1600, y: 1100, w: 260, h: 160, id: "booth2", name: "Network Booth" },
+  { x: 800, y: 400, w: 200, h: 200, id: "booth3", name: "Crypto Booth" },
+  { x: 1000, y: 1000, w: 200, h: 200, id: "booth4", name: "Prueba Booth" },
 ];
+
+// Interaction distance - how close player needs to be to trigger booth
+const INTERACTION_DISTANCE = 50; // Reduced since we're using collision detection
 
 // Viewport (the window to the world)
 const VIEWPORT: Vec2 = { x: 960, y: 540 };
@@ -39,21 +42,82 @@ function rectsOverlap(a: Rect, b: Rect) {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
+// Check if player is colliding with a booth
+function isCollidingWithBooth(playerPos: Vec2, booth: Rect): boolean {
+  const playerSize = 20; // Player collision box size
+  const playerRect: Rect = {
+    x: playerPos.x - playerSize / 2,
+    y: playerPos.y - playerSize / 2,
+    w: playerSize,
+    h: playerSize
+  };
+  
+  const isColliding = rectsOverlap(playerRect, booth);
+  
+  // Debug log
+  if (isColliding) {
+    console.log(`🎯 COLLISION with ${booth.id} (${booth.name})`);
+    console.log(`  Player: (${playerPos.x}, ${playerPos.y})`);
+    console.log(`  Booth: (${booth.x}, ${booth.y}, ${booth.w}x${booth.h})`);
+  }
+  
+  return isColliding;
+}
+
 export default function ImageWorld() {
+  const navigate = useNavigate();
+  
   // Player state in WORLD coordinates
   const [player, setPlayer] = useState<Vec2>({ x: 400, y: 300 });
+  const [nearBooth, setNearBooth] = useState<string | null>(null);
   const speed = 240; // px/sec
   const half = 10; // player half-size for collisions
 
   // Keyboard
   const keys = useRef<Set<string>>(new Set());
   useEffect(() => {
-    const down = (e: KeyboardEvent) => keys.current.add(e.key);
+    const down = (e: KeyboardEvent) => {
+      // Handle booth interaction first
+      if (e.key === " ") {
+        console.log(`Space pressed, nearBooth: ${nearBooth}`);
+        if (nearBooth) {
+          e.preventDefault();
+          const booth = BOOTHS.find(b => b.id === nearBooth);
+          if (booth) {
+            console.log(`Navigating to quiz for booth: ${booth.id}`);
+            navigate(`/quiz?boothId=${booth.id}`);
+            return; // Don't add space to movement keys
+          }
+        }
+      }
+      
+      // Add movement keys
+      keys.current.add(e.key);
+    };
+    
     const up = (e: KeyboardEvent) => keys.current.delete(e.key);
+    
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
-    return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); };
-  }, []);
+    return () => { 
+      window.removeEventListener("keydown", down); 
+      window.removeEventListener("keyup", up); 
+    };
+  }, [nearBooth, navigate]);
+
+  // Check for booth collision
+  useEffect(() => {
+    const currentBooth = BOOTHS.find(booth => isCollidingWithBooth(player, booth));
+    if (currentBooth) {
+      console.log(`🎯 COLLIDING with booth: ${currentBooth.id} (${currentBooth.name})`);
+      setNearBooth(currentBooth.id);
+    } else {
+      if (nearBooth) {
+        console.log("No longer colliding with any booth");
+      }
+      setNearBooth(null);
+    }
+  }, [player, nearBooth]);
 
   // Game loop
   const raf = useRef<number | null>(null);
@@ -79,21 +143,8 @@ export default function ImageWorld() {
           let nx = clamp(p.x + dx * speed * dt, half, MAP_SIZE.x - half);
           let ny = clamp(p.y + dy * speed * dt, half, MAP_SIZE.y - half);
 
-          // Simple collision: push back if overlaps any block
-          const me: Rect = { x: nx - half, y: ny - half, w: half * 2, h: half * 2 };
-          for (const b of BLOCKS) {
-            if (rectsOverlap(me, b)) {
-              // Resolve separately on each axis for a simple response
-              // Try X only
-              const tryX: Rect = { x: nx - half, y: p.y - half, w: half * 2, h: half * 2 };
-              if (!rectsOverlap(tryX, b)) { ny = p.y; break; }
-              // Try Y only
-              const tryY: Rect = { x: p.x - half, y: ny - half, w: half * 2, h: half * 2 };
-              if (!rectsOverlap(tryY, b)) { nx = p.x; break; }
-              // Neither works: stay put
-              nx = p.x; ny = p.y; break;
-            }
-          }
+          // Allow collision with booths - don't block movement, just detect collision
+          // The collision detection will be handled by the useEffect above
           return { x: nx, y: ny };
         });
       }
@@ -126,10 +177,22 @@ export default function ImageWorld() {
             backgroundRepeat: "no-repeat",
           }}
         >
-          {/* Optional: visualize blocking rects while tuning */}
-          {BLOCKS.map((b, i) => (
-            <div key={i} className="absolute bg-red-500/30 border border-red-500/60"
-                style={{ left: b.x, top: b.y, width: b.w, height: b.h }} />
+          {/* Booth visualization */}
+          {BOOTHS.map((booth, i) => (
+            <div key={i} className={`absolute border-2 transition-all duration-200 ${
+              nearBooth === booth.id 
+                ? "bg-yellow-500/40 border-yellow-400 shadow-lg shadow-yellow-400/50" 
+                : booth.id === "booth3" 
+                  ? "bg-green-500/30 border-green-400" // Special color for booth3
+                  : "bg-blue-500/30 border-blue-400"
+            }`}
+                style={{ left: booth.x, top: booth.y, width: booth.w, height: booth.h }}>
+              <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 text-white font-game text-sm px-2 py-1 rounded ${
+                booth.id === "booth3" ? "bg-green-600/70" : "bg-black/50"
+              }`}>
+                {booth.name} {booth.id === "booth3" && "🟢"}
+              </div>
+            </div>
           ))}
 
           {/* Player */}
@@ -145,13 +208,27 @@ export default function ImageWorld() {
 
         {/* HUD */}
         <div className="absolute left-3 top-3 text-xs text-white/90 bg-slate-900/60 backdrop-blur px-3 py-2 rounded-md border border-white/10">
-          <div className="font-semibold">Image Map • Camera Follow</div>
-          <div>WASD / Arrows</div>
+          <div className="font-semibold">CyberHunt World Map</div>
+          <div>WASD / Arrows to move</div>
+          <div>Space to enter booth when colliding</div>
           <div>
             Pos: <span className="tabular-nums">{Math.round(player.x)}</span>,{" "}
             <span className="tabular-nums">{Math.round(player.y)}</span>
           </div>
+          <div>
+            Colliding with: <span className="tabular-nums">{nearBooth || "None"}</span>
+          </div>
+          <div className="text-yellow-400">
+            Walk into booths to interact
+          </div>
         </div>
+
+        {/* Interaction prompt */}
+        {nearBooth && (
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-white font-game text-lg bg-green-600/80 backdrop-blur px-4 py-2 rounded-lg border border-green-400 shadow-lg">
+            🎯 COLLISION DETECTED! Press SPACE to enter {BOOTHS.find(b => b.id === nearBooth)?.name}
+          </div>
+        )}
       </div>
     </div>
   );
